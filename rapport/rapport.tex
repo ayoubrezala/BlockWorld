@@ -1,0 +1,202 @@
+\documentclass[12pt]{article}
+\usepackage{listings}
+\usepackage[frenchb]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{algorithmic}
+\usepackage{xcolor}
+\usepackage{color}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{url}
+\usepackage[linesnumbered, ruled, french, onelanguage]{algorithm2e}
+\makeatletter
+\g@addto@macro{\@algocf@init}{\SetKwInput{KwOut}{Sortie}}
+\makeatother
+\usepackage{geometry}
+\usepackage{hyperref}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+backgroundcolor=\color{backcolour},
+commentstyle=\color{codegreen},
+keywordstyle=\color{magenta},
+numberstyle=\tiny\color{codegray},
+stringstyle=\color{codepurple},
+basicstyle=\ttfamily\footnotesize,
+breakatwhitespace=false,
+breaklines=true,
+captionpos=b,
+keepspaces=true,
+numbers=left,
+numbersep=5pt,
+showspaces=false,
+showstringspaces=false,
+showtabs=false,
+tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\hypersetup{pdftoolbar=true, colorlinks=true, linkcolor=black, 
+    citecolor=black, filecolor=black, urlcolor=black
+}
+
+\begin{document}
+% Page de garde
+\begin{titlepage}
+    \begin{center}
+        \includegraphics[width=8cm]{./images/unicaen.png}\par
+        \vspace{0.2cm}
+        FACULTÉ DES SCIENCES \\
+        LICENCE 3 INFORMATIQUE
+        \rule{0.95\textwidth}{2pt}\\
+        \vspace{1cm}
+        \Huge \textbf{Aide à la Décision en Intelligence Artificielle}\par
+        \vspace{0.5cm}
+        \rule{0.95\textwidth}{2pt}\\
+        \vspace{0.5cm}
+        \Large \textbf{Rapport - Fil Rouge}\par
+        \vspace{2cm}
+    \end{center}
+    \Large \textbf{Auteurs:}\\
+    \begin{tabular}{p{8cm}p{8cm}}
+        \Large \textbf{Anis IDRES}   & \Large \textbf{Ayoub REZALA}  \\
+    \end{tabular}
+    \vspace{2cm}
+    \begin{center}
+        \Large \textbf{Année Universitaire: 2024/2025}
+    \end{center}
+\end{titlepage}
+
+% Table des matières
+\newpage
+\pagenumbering{roman}
+\tableofcontents
+\newpage
+
+% Début du contenu
+\pagenumbering{arabic}
+
+\section{Introduction}
+Le projet nommé {\bf Fil Rouge} représente une mise en œuvre complète du {\bf monde des
+blocs (BlocksWorld)}, un exemple classique d’application en Intelligence Artificielle. Ce
+projet, développé en Java, aborde les principaux concepts d’IA, tels que la modélisation,
+la planification, et la résolution de contraintes. \newline
+Chaque composante du projet est associée à une classe exécutable, permettant une ex-
+ploration approfondie et une interaction simplifiée pour tester différentes fonctionnalités.
+Une bibliothèque graphique, blocksworld.jar, est également intégrée pour visualiser les
+configurations et les actions dans le monde des blocs.
+\newline
+Enfin, des solveurs sont exploités pour valider la satisfaction des contraintes, et des
+algorithmes spécifiques sont utilisés pour améliorer la performance et analyser les solutions
+possibles.
+
+\section{Parties du Projet}
+\subsection{Modélisation}
+Dans notre modélisation, nous avons choisi d'utiliser les classes \texttt{Variable} et \texttt{BooleanVariable}, développées lors des premiers TPs, pour représenter les différentes variables du monde des blocs. Plus précisément, les variables \texttt{on}, qui indiquent la position des blocs, sont représentées par la classe \texttt{Variable}, tandis que les variables \texttt{fixed} (indiquant si un bloc est fixé) et \texttt{free} (indiquant si une pile est libre) utilisent la classe \texttt{BooleanVariable}. La gestion et la récupération de ces variables sont centralisées dans la classe \texttt{BlocksWorld}.
+
+Pour représenter les contraintes, nous avons utilisé les différentes classes \texttt{Constraint}, \texttt{DifferenceConstraint}, \texttt{Implication}, et \texttt{UnaryConstraint}, également développées lors des TPs. La classe \texttt{BlocksWorldConstraints} est chargée de générer trois types de contraintes :
+
+Les contraintes de différence, empêchant deux blocs d'occuper la même position.
+Les contraintes d'implication, qui lient la position d'un bloc à son état de fixation (\texttt{fixed}) ou à la disponibilité d'une pile (\texttt{free}).
+La classe \texttt{BlocksWorldRegular} ajoute des contraintes supplémentaires pour garantir que les blocs posés sur chaque pile respectent un écart constant entre leurs indices. De son côté, la classe \texttt{Croissante} génère des contraintes assurant que les blocs sont positionnés de manière croissante, c'est-à-dire qu'un bloc ne peut être placé que sur un bloc ayant un indice inférieur ou directement sur une pile.
+
+Enfin, la classe \texttt{DemoModelling} sert de point d'entrée exécutable pour tester nos configurations. Elle permet de vérifier si des configurations données respectent les contraintes de régularité et de croissance définies par notre modélisation.
+\subsection{Planification}
+Pour la partie planification, nous avons développé une classe permettant de gérer toutes les actions possibles dans un monde des blocs. Chaque action est représentée comme une instance de la classe \texttt{BasicAction}, que nous avons implémentée lors des TPs. Une action est définie par deux éléments essentiels :
+\begin{itemize}
+    \item Une \textbf{map de préconditions}, regroupant les conditions nécessaires à son exécution.
+    \item Une \textbf{map d’effets}, décrivant les modifications appliquées au monde des blocs après l’exécution de l’action.
+\end{itemize}
+
+Pour tester les différents planificateurs, nous avons créé des états initiaux et finaux. Ces états sont définis en parcourant l’ensemble des variables du monde des blocs et en leur attribuant des valeurs correspondant à la position souhaitée pour chaque bloc.
+
+Dans la classe \texttt{DemoPlanning}, nous générons un état initial et un état final, puis exécutons les principaux algorithmes de planification, tels que :
+\begin{itemize}
+    \item \texttt{DFS} (Depth-First Search),
+    \item \texttt{BFS} (Breadth-First Search),
+    \item \texttt{Dijkstra},
+    \item et \texttt{A*}.
+\end{itemize}
+Pour chacun de ces planificateurs, nous affichons le plan trouvé ainsi que des métriques comme le \textbf{nombre de nœuds explorés} et le \textbf{temps d’exécution}.
+
+Deux heuristiques significatives ont été intégrées pour guider le processus de planification :
+\begin{enumerate}
+    \item \textbf{Nombre de blocs mal placés} : Cette heuristique évalue le nombre de blocs qui ne sont pas à leur position cible à chaque étape. Elle permet de minimiser progressivement les erreurs de placement, contribuant à une planification plus précise.
+    \item \textbf{Distance totale des déplacements} : Cette heuristique calcule la distance totale que chaque bloc doit parcourir pour atteindre sa position finale. Elle fournit une estimation utile pour orienter la planification vers des solutions efficaces en réduisant les déplacements.
+\end{enumerate}
+
+Ces heuristiques renforcent notre capacité à explorer et évaluer les plans de manière plus détaillée, aboutissant à des solutions de planification optimisées.
+
+Enfin, pour la visualisation graphique des états et des actions dans le monde des blocs, nous utilisons la bibliothèque \texttt{blocksworld.jar}, qui permet d’afficher les configurations de manière intuitive et interactive.
+
+\subsection{Problème de satisfaction des contraintes}
+La résolution des problèmes de planification dans le monde des blocs repose sur la \textbf{satisfaction de contraintes}, un concept fondamental permettant de modéliser les relations entre les différentes entités du problème. Trois classes exécutables sont utilisées pour représenter des configurations distinctes du problème :
+
+\begin{itemize}
+    \item \texttt{DemoReguliere} : Cette classe se concentre sur la validation des contraintes régulières dans les configurations du monde des blocs.
+    \item \texttt{DemoCroissante} : Cette classe implémente des contraintes garantissant une organisation croissante, où chaque bloc est positionné uniquement sur un bloc ayant un indice inférieur ou sur une pile.
+    \item \texttt{DemoCroissanteReguliere} : Cette classe combine les contraintes régulières et croissantes pour offrir une solution plus complète et stricte.
+\end{itemize}
+
+Ces classes utilisent différents solveurs pour résoudre les problèmes de planification :
+\begin{itemize}
+    \item \texttt{BacktrackSolver} : Un solveur basé sur une recherche exhaustive avec retour en arrière.
+    \item \texttt{MACSolver} : Un solveur optimisé exploitant la cohérence des arcs pour réduire l'espace de recherche.
+    \item \texttt{HeuristicMACSolver} : Une version améliorée intégrant des heuristiques spécifiques pour accélérer la recherche de solutions optimales.
+\end{itemize}
+
+Chaque démo évalue les performances des solveurs en mesurant le \textbf{temps de calcul} nécessaire et en comparant l'efficacité des approches utilisées pour résoudre les configurations définies. Ces mesures permettent de mieux comprendre l'impact des contraintes et des heuristiques sur les solutions obtenues.
+
+\subsection{Extraction de connaissances}
+Dans la section dédiée à l'extraction de connaissances, nous avons développé une classe appelée \texttt{BooleanBlocksWorld} pour modéliser le monde des blocs sous forme de variables booléennes. Cette classe est conçue pour créer un ensemble de variables booléennes représentant les relations entre les blocs dans un monde donné. Ces variables booléennes sont utilisées pour construire une base de données booléenne (\texttt{BooleanDatabase}).
+
+Pour $n$ instances, nous récupérons un état généré à l'aide de la méthode \texttt{getState()} de la bibliothèque fournie \texttt{bwgenerator}. Ensuite, nous ajoutons les \texttt{BooleanVariable} correspondant à cet état dans notre base de données. Ainsi, cette base de données est remplie avec des instances générées du monde des blocs, chaque instance étant représentée par un ensemble de ces variables booléennes.
+
+Pour extraire des connaissances à partir de cette base de données, deux algorithmes distincts ont été appliqués :
+\begin{itemize}
+    \item \textbf{Algorithme Apriori} : Utilisé pour découvrir des motifs fréquents, révélant des configurations récurrentes dans le monde des blocs.
+    \item \textbf{Algorithme de force brute} : Utilisé pour extraire des règles d'association, mettant en évidence des relations significatives entre les variables.
+\end{itemize}
+
+L'exécution de ce programme est initiée par la classe \texttt{DemoDataMining}, qui offre une vue d'ensemble des motifs fréquents et des règles d'association extraites. Cela permet d'analyser et de mieux comprendre les relations et les configurations typiques dans le contexte du modèle du monde des blocs.
+
+\section{Classes exécutables}
+\begin{itemize}
+    \item \textbf{Modélisation :} \texttt{DemoModelling}
+    \item \textbf{Planification :} \texttt{DemoPlanning}
+    \item \textbf{Problème de satisfaction de contraintes :}
+    \begin{itemize}
+        \item \textbf{Configuration Régulière :} \texttt{DemoReguliere}
+        \item \textbf{Configuration Croissante :} \texttt{DemoCroissante}
+        \item \textbf{Configuration Régulière \& Croissante :} \texttt{DemoCroissanteReguliere}
+    \end{itemize}
+    \item \textbf{Extraction de connaissances :} \texttt{DemoDataMining}
+\end{itemize}
+
+\section{Commandes de compilation et d'exécution}
+Pour assurer une utilisation optimale de notre projet, il est essentiel de suivre les bonnes pratiques de compilation et d'exécution. Ces étapes permettent de préparer et de tester efficacement les fonctionnalités développées. Voici les instructions détaillées :
+
+\begin{enumerate}
+    \item Tout d'abord, ouvrez un terminal dans le répertoire source \texttt{/src} de notre projet.
+    \item Ensuite, pour compiler toutes les classes nécessaires et prendre en compte les bibliothèques externes \texttt{blocksworld.jar} et \texttt{bwgenerator.jar}, utilisez la commande suivante :
+    \begin{lstlisting}[language=Bash, frame=single]
+    javac -d ../build -cp .:../lib/blocksworld.jar:../lib/bwgenerator.jar modelling/*.java planning/*.java cp/*.java datamining/*.java blocksworld/*.java
+    \end{lstlisting}
+    \item Une fois la compilation réussie, vous pouvez exécuter n'importe quelle classe exécutable de votre projet en utilisant la commande suivante. Assurez-vous de remplacer \texttt{NOM\_CLASSE\_EXECUTABLE} par le nom réel de la classe que vous souhaitez exécuter :
+    \begin{lstlisting}[language=Bash, frame=single]
+    java -cp ../build:../lib/blocksworld.jar:../lib/bwgenerator.jar blocksworld.NOM_CLASSE_EXECUTABLE
+    \end{lstlisting}
+\end{enumerate}
+
+
+
+\end{document}
